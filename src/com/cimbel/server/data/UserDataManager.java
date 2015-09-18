@@ -6,7 +6,7 @@ public class UserDataManager {
 
     private static final int MAX_USER = 2 << 20;
 
-    private static UserDataManager dataAccessorSingleton;
+    private static UserDataManager mDataManagerSingleton;
 
     private Map<Integer, String> mIdToNickMapping;
     private Map<String, Integer> mNickToIdMapping;
@@ -20,14 +20,15 @@ public class UserDataManager {
         mIdToNickMapping = new TreeMap<>();
         mNickToIdMapping = new TreeMap<>();
         mChannelUserSetMap = new TreeMap<>();
+        mUserChannelSetMap = new TreeMap<>();
         mRandom = new Random();
     }
 
     public static UserDataManager getInstance() {
-        if (dataAccessorSingleton == null) {
-            dataAccessorSingleton = new UserDataManager();
+        if (mDataManagerSingleton == null) {
+            mDataManagerSingleton = new UserDataManager();
         }
-        return dataAccessorSingleton;
+        return mDataManagerSingleton;
     }
 
     public boolean isNicknameExist(String nick) {
