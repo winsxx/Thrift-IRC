@@ -44,7 +44,7 @@ public class FetchMessageTask {
     }
 
     public void start() {
-        mTimer.schedule(mFetchTask,15*1000);
+        mTimer.scheduleAtFixedRate(mFetchTask,0,15*1000);
     }
 
 

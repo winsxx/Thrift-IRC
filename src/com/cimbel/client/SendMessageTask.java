@@ -1,7 +1,10 @@
 package com.cimbel.client;
 
+import com.cimbel.ircservice.MessageException;
 import com.cimbel.ircservice.MessageService;
+import com.cimbel.ircservice.UserManagementException;
 import com.cimbel.ircservice.UserManagementService;
+import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion;
 
 import java.util.concurrent.BlockingQueue;
 
@@ -58,12 +61,17 @@ public class SendMessageTask implements Runnable{
                 String commandString = getCommand(inputString);
 
                 if (commandString.equals(Command.NICK.getCommandString())) {
-                    String nick = getPayload(inputString);
-                    System.out.printf("Login with nickname : %s\n",nick);
-                    mUserId = mUserServiceClient.loginNick(nick);
+                    if (mUserId == -1) {
+                        String nick = getPayload(inputString);
+                        mUserId = mUserServiceClient.loginNick(nick);
 
-                    mFetchMessageTask = mFetchMessageTaskFactory.buildMessageTask(mUserId);
-                    mFetchMessageTask.start();
+                        mFetchMessageTask = mFetchMessageTaskFactory.buildMessageTask(mUserId);
+                        mFetchMessageTask.start();
+
+                        Screen.printNotification("[SUCCESS] Login successful");
+                    } else {
+                        Screen.printNotification("[ERROR] You have login before. Exit this application and try again.");
+                    }
 
                 } else if (commandString.equals(Command.EXIT.getCommandString())) {
                     if (mUserId != NOT_LOGIN) {
@@ -74,13 +82,19 @@ public class SendMessageTask implements Runnable{
 
                 }else if (mUserId == NOT_LOGIN) {
 
+                    Screen.printNotification("[ERROR] You need to login. Please login and try again.");
+
                 } else if (commandString.equals(Command.JOIN.getCommandString())) {
                     String channel = getPayload(inputString);
                     mUserServiceClient.joinChannel(mUserId, channel);
 
+                    Screen.printNotification("[SUCCESS] You join channel " + channel + " successfully");
+
                 } else if (commandString.equals(Command.LEAVE.getCommandString())) {
                     String channel = getPayload(inputString);
                     mUserServiceClient.leaveChannel(mUserId, channel);
+
+                    Screen.printNotification("[SUCCESS] You leave channel " + channel + " successfully");
                 } else {
 
                     if (commandString.charAt(0) == '@') {
@@ -92,9 +106,8 @@ public class SendMessageTask implements Runnable{
                     }
 
                 }
-
-            } catch(Exception e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                Screen.printNotification("[ERROR]" + e.getMessage());
             }
         }
     }

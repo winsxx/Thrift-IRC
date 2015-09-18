@@ -20,7 +20,7 @@ public class ReadInputTask implements Runnable {
         while(!Thread.currentThread().isInterrupted()) {
             Scanner reader = new Scanner(System.in);
             String input = reader.nextLine();
-
+            Screen.nextInput();
             try {
                 mInputQueue.put(input);
             } catch (InterruptedException e) {
