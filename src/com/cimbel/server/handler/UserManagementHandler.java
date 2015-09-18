@@ -18,6 +18,7 @@ public class UserManagementHandler implements UserManagementService.Iface {
 
     @Override
     public int loginNick(String nick) throws TException {
+        System.out.println(nick);
         try {
             return userDataManager.addUser(nick);
         } catch (SecurityException se) {
