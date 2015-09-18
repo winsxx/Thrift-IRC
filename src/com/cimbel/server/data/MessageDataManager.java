@@ -5,42 +5,53 @@ import java.util.*;
 public class MessageDataManager {
 
     private static MessageDataManager mDataManagerSingleton;
-
-    private Map<Integer, Queue<String>> mUserMessageQueueMap;
+    private final Object mapLock;
+    private Map<Integer, List<String>> mUserMessageListMap;
 
     private MessageDataManager() {
-        mUserMessageQueueMap = new TreeMap<>();
+        mUserMessageListMap = new TreeMap<>();
+        mapLock = new Object();
     }
 
-    public static MessageDataManager getInstance() {
+    public static synchronized MessageDataManager getInstance() {
         if (mDataManagerSingleton == null) {
             mDataManagerSingleton = new MessageDataManager();
         }
         return mDataManagerSingleton;
     }
 
-    public boolean isUserHaveMessages(int userId) {
-        return mUserMessageQueueMap.containsKey(userId) && (mUserMessageQueueMap.get(userId).size() > 0);
-    }
-
     public List<String> popUserMessages(int userId) {
-        Queue<String> messagesQueue = mUserMessageQueueMap.get(userId);
-        List<String> messagesList = new ArrayList<>(messagesQueue);
-        mUserMessageQueueMap.remove(userId);
-        return messagesList;
+        synchronized (mapLock) {
+            if (isUserHaveMessages(userId)) {
+                List<String> messagesSyncList = mUserMessageListMap.get(userId);
+                List<String> messagesList = new ArrayList<>(messagesSyncList);
+                mUserMessageListMap.remove(userId);
+                return messagesList;
+            } else {
+                return new ArrayList<>();
+            }
+        }
     }
 
     public void pushUserMessage(int userId, String message) {
-        if (!mUserMessageQueueMap.containsKey(userId)) {
-            mUserMessageQueueMap.put(userId, new LinkedList<>());
+        synchronized (mapLock) {
+            if (!mUserMessageListMap.containsKey(userId)) {
+                mUserMessageListMap.put(userId, new LinkedList<>());
+            }
+            List<String> messagesList = mUserMessageListMap.get(userId);
+            messagesList.add(message);
         }
-        Queue<String> messagesQueue = mUserMessageQueueMap.get(userId);
-        messagesQueue.add(message);
     }
 
     public void deleteUserMessages(int userId) {
-        if (mUserMessageQueueMap.containsKey(userId)) {
-            mUserMessageQueueMap.remove(userId);
+        synchronized (mapLock) {
+            if (mUserMessageListMap.containsKey(userId)) {
+                mUserMessageListMap.remove(userId);
+            }
         }
+    }
+
+    private boolean isUserHaveMessages(int userId) {
+        return mUserMessageListMap.containsKey(userId) && (mUserMessageListMap.get(userId).size() > 0);
     }
 }

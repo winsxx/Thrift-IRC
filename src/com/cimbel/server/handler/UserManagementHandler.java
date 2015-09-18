@@ -3,14 +3,17 @@ package com.cimbel.server.handler;
 import com.cimbel.ircservice.UserManagementErrorType;
 import com.cimbel.ircservice.UserManagementException;
 import com.cimbel.ircservice.UserManagementService;
+import com.cimbel.server.data.MessageDataManager;
 import com.cimbel.server.data.UserDataManager;
 import org.apache.thrift.TException;
 
 public class UserManagementHandler implements UserManagementService.Iface {
     private UserDataManager userDataManager;
+    private MessageDataManager messageDataManager;
 
     public UserManagementHandler() {
         userDataManager = UserDataManager.getInstance();
+        messageDataManager = MessageDataManager.getInstance();
     }
 
     @Override
@@ -47,6 +50,7 @@ public class UserManagementHandler implements UserManagementService.Iface {
             throw new UserManagementException(UserManagementErrorType.USER_ID_NOT_FOUND,
                     "User id not found");
         }
+        messageDataManager.deleteUserMessages(userId);
         userDataManager.removeUser(userId);
     }
 }
