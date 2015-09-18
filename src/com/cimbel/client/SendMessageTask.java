@@ -58,14 +58,14 @@ public class SendMessageTask implements Runnable{
                 String commandString = getCommand(inputString);
 
                 if (commandString.equals(Command.NICK.getCommandString())) {
-                    String nick = getPayload(commandString);
+                    String nick = getPayload(inputString);
+                    System.out.printf("Login with nickname : %s\n",nick);
                     mUserId = mUserServiceClient.loginNick(nick);
 
                     mFetchMessageTask = mFetchMessageTaskFactory.buildMessageTask(mUserId);
                     mFetchMessageTask.start();
 
                 } else if (commandString.equals(Command.EXIT.getCommandString())) {
-                    String exit = getPayload(commandString);
                     if (mUserId != NOT_LOGIN) {
                         mUserServiceClient.logoutUser(mUserId);
                         mFetchMessageTask.stop();
@@ -75,11 +75,11 @@ public class SendMessageTask implements Runnable{
                 }else if (mUserId == NOT_LOGIN) {
 
                 } else if (commandString.equals(Command.JOIN.getCommandString())) {
-                    String channel = getPayload(commandString);
+                    String channel = getPayload(inputString);
                     mUserServiceClient.joinChannel(mUserId, channel);
 
                 } else if (commandString.equals(Command.LEAVE.getCommandString())) {
-                    String channel = getPayload(commandString);
+                    String channel = getPayload(inputString);
                     mUserServiceClient.leaveChannel(mUserId, channel);
                 } else {
 

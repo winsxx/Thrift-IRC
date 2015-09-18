@@ -6,11 +6,11 @@ import java.util.concurrent.BlockingQueue;
 /**
  * Created by kevinyu on 9/17/15.
  */
-public class InputReaderTask implements Runnable {
+public class ReadInputTask implements Runnable {
 
     private BlockingQueue<String> mInputQueue;
 
-    public InputReaderTask(BlockingQueue inputQueue) {
+    public ReadInputTask(BlockingQueue inputQueue) {
         mInputQueue = inputQueue;
     }
 

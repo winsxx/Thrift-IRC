@@ -4,6 +4,8 @@ import com.cimbel.ircservice.MessageService;
 import com.cimbel.ircservice.UserManagementService;
 import com.cimbel.server.handler.MessageHandler;
 import com.cimbel.server.handler.UserManagementHandler;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.PropertyConfigurator;
 import org.apache.thrift.TMultiplexedProcessor;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadPoolServer;
@@ -28,7 +30,10 @@ public class IrcServer {
      */
     public static TMultiplexedProcessor multiplexedProcessor;
 
-    public IrcServer() {
+    public static void main(String[] args) {
+
+        BasicConfigurator.configure();
+
         userManagementHandler = new UserManagementHandler();
         userManagementProcessor = new UserManagementService.Processor<>(userManagementHandler);
 
@@ -38,10 +43,7 @@ public class IrcServer {
         multiplexedProcessor = new TMultiplexedProcessor();
         multiplexedProcessor.registerProcessor(USER_MANAGEMENT_SERVICE_NAME, userManagementProcessor);
         multiplexedProcessor.registerProcessor(MESSAGE_SERVICE_NAME, messageProcessor);
-    }
 
-
-    public static void main(String[] args) {
         try {
             TServerTransport serverTransport = new TServerSocket(SERVICE_PORT);
             TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport).processor(multiplexedProcessor));

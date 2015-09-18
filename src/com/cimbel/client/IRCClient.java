@@ -2,11 +2,6 @@ package com.cimbel.client;
 
 import com.cimbel.ircservice.MessageService;
 import com.cimbel.ircservice.UserManagementService;
-import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.transport.TSocket;
-import org.apache.thrift.transport.TTransport;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -19,22 +14,17 @@ public class IRCClient {
     public static void main(String args[]) {
 
         try {
-            TTransport transport;
 
-            transport = new TSocket("localhost", 8081);
-            transport.open();
+            ClientFactory clientFactory = new ClientFactory("localhost",8081);
 
-            TProtocol protocol = new TBinaryProtocol(transport);
-            UserManagementService.Client userServiceClient = new
-                    UserManagementService.Client(protocol);
+            UserManagementService.Client userServiceClient = clientFactory.buildUserServiceClient();
+            MessageService.Client sendMessageClient = clientFactory.buildMessageServiceClient();
 
-            MessageService.Client sendMessageClient = new
-                    MessageService.Client(protocol);
-
-            FetchMessageTaskFactory fetchMessageTaskFactory = new FetchMessageTaskFactory(protocol);
+            FetchMessageTaskFactory fetchMessageTaskFactory = new FetchMessageTaskFactory(
+                    clientFactory.buildMessageServiceClient());
 
             BlockingQueue<String> messageQueue = new ArrayBlockingQueue<String>(100);
-            InputReaderTask inputReaderTask = new InputReaderTask(messageQueue);
+            ReadInputTask inputReaderTask = new ReadInputTask(messageQueue);
 
             SendMessageTask sendMessageTask = new SendMessageTask(userServiceClient, sendMessageClient,
                     fetchMessageTaskFactory,messageQueue);
@@ -49,7 +39,7 @@ public class IRCClient {
 
             sendMessageThread.join();
 
-            transport.close();
+            clientFactory.closeTransport();
 
             System.exit(0);
         } catch (Exception e) {
