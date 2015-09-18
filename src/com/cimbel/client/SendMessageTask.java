@@ -1,9 +1,6 @@
 package com.cimbel.client;
 
-import com.cimbel.ircservice.MessageException;
-import com.cimbel.ircservice.MessageService;
-import com.cimbel.ircservice.UserManagementException;
-import com.cimbel.ircservice.UserManagementService;
+import com.cimbel.ircservice.*;
 import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion;
 
 import java.util.concurrent.BlockingQueue;
@@ -20,6 +17,7 @@ public class SendMessageTask implements Runnable{
     private FetchMessageTaskFactory mFetchMessageTaskFactory;
     private FetchMessageTask mFetchMessageTask;
 
+    private UserLoginData loginData;
     private int mUserId;
 
     private static int NOT_LOGIN = -1;
@@ -63,12 +61,13 @@ public class SendMessageTask implements Runnable{
                 if (commandString.equals(Command.NICK.getCommandString())) {
                     if (mUserId == -1) {
                         String nick = getPayload(inputString);
-                        mUserId = mUserServiceClient.loginNick(nick);
+                        loginData = mUserServiceClient.loginNick(nick);
+                        mUserId = loginData.userId;
 
                         mFetchMessageTask = mFetchMessageTaskFactory.buildMessageTask(mUserId);
                         mFetchMessageTask.start();
 
-                        Screen.printNotification("[SUCCESS] Login successful");
+                        Screen.printNotification("[SUCCESS] Login successful as " + loginData.nick);
                     } else {
                         Screen.printNotification("[ERROR] You have login before. Exit this application and try again.");
                     }
