@@ -54,6 +54,10 @@ public class UserDataManager {
         }
     }
 
+    public String getUserNick(int userId) {
+        return mIdToNickMapping.get(userId);
+    }
+
     public boolean removeUser(int userId) {
         if (isUserIdExist(userId)) {
             String nick = mIdToNickMapping.get(userId);

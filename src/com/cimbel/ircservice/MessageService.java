@@ -33,8 +33,6 @@ public class MessageService {
          *
          * @param userId  - Id which user got when login
          * @param message - Message to be send.
-         * @param userId
-         * @param message
          */
         public void sendMessage(int userId, String message) throws MessageException, org.apache.thrift.TException;
 
@@ -44,9 +42,6 @@ public class MessageService {
          * @param userId  - Id which user got when login
          * @param channel - Channel name
          * @param message - Message to be send.
-         * @param userId
-         * @param channel
-         * @param message
          */
         public void sendMessageToChannel(int userId, String channel, String message) throws MessageException, org.apache.thrift.TException;
 
@@ -54,7 +49,6 @@ public class MessageService {
          * Recieve all message that the user got after login.
          *
          * @param userId - Id which user got when login
-         * @param userId
          * @return list<string> - List of message
          */
         public List<String> fetchMessage(int userId) throws MessageException, org.apache.thrift.TException;

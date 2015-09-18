@@ -32,7 +32,6 @@ public class UserManagementService {
          * Register and login user with nick. User will get userId if the nick is available. Return exception if nick not available
          *
          * @param nick - requested nick
-         * @param nick
          * @return i32 - user id
          */
         public int loginNick(String nick) throws UserManagementException, org.apache.thrift.TException;
@@ -42,8 +41,6 @@ public class UserManagementService {
          *
          * @param userId  - Id which user got when login
          * @param string  channel - Channel name
-         * @param userId
-         * @param channel
          */
         public void joinChannel(int userId, String channel) throws UserManagementException, org.apache.thrift.TException;
 
@@ -52,8 +49,6 @@ public class UserManagementService {
          *
          * @param userId  - Id which user got when login
          * @param string  channel - Channel name
-         * @param userId
-         * @param channel
          */
         public void leaveChannel(int userId, String channel) throws UserManagementException, org.apache.thrift.TException;
 
@@ -61,7 +56,6 @@ public class UserManagementService {
          * Logout user. Remove all data about user from server. Return exception if user id not exist.
          *
          * @param userId - Id which user got when login
-         * @param userId
          */
         public void logoutUser(int userId) throws UserManagementException, org.apache.thrift.TException;
 
