@@ -12,7 +12,10 @@ import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
 
+import java.util.logging.Logger;
+
 public class IrcServer {
+    private static final Logger log = Logger.getLogger( IrcServer.class.getName() );
 
     public static final int SERVICE_PORT = 8081;
     public static final String USER_MANAGEMENT_SERVICE_NAME = "UserManagement";
@@ -40,6 +43,7 @@ public class IrcServer {
         messageHandler = new MessageHandler();
         messageProcessor = new MessageService.Processor<>(messageHandler);
 
+        log.info("Register processor...");
         multiplexedProcessor = new TMultiplexedProcessor();
         multiplexedProcessor.registerProcessor(USER_MANAGEMENT_SERVICE_NAME, userManagementProcessor);
         multiplexedProcessor.registerProcessor(MESSAGE_SERVICE_NAME, messageProcessor);
