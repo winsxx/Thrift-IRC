@@ -12,6 +12,10 @@ import org.apache.thrift.transport.TServerTransport;
 
 public class IrcServer {
 
+    public static final int SERVICE_PORT = 8081;
+    public static final String USER_MANAGEMENT_SERVICE_NAME = "UserManagement";
+    public static final String MESSAGE_SERVICE_NAME = "Message";
+
     public static UserManagementHandler userManagementHandler;
     public static UserManagementService.Processor<UserManagementHandler> userManagementProcessor;
 
@@ -24,20 +28,22 @@ public class IrcServer {
      */
     public static TMultiplexedProcessor multiplexedProcessor;
 
+    public IrcServer() {
+        userManagementHandler = new UserManagementHandler();
+        userManagementProcessor = new UserManagementService.Processor<>(userManagementHandler);
+
+        messageHandler = new MessageHandler();
+        messageProcessor = new MessageService.Processor<>(messageHandler);
+
+        multiplexedProcessor = new TMultiplexedProcessor();
+        multiplexedProcessor.registerProcessor(USER_MANAGEMENT_SERVICE_NAME, userManagementProcessor);
+        multiplexedProcessor.registerProcessor(MESSAGE_SERVICE_NAME, messageProcessor);
+    }
+
 
     public static void main(String[] args) {
         try {
-            userManagementHandler = new UserManagementHandler();
-            userManagementProcessor = new UserManagementService.Processor<>(userManagementHandler);
-
-            messageHandler = new MessageHandler();
-            messageProcessor = new MessageService.Processor<>(messageHandler);
-
-            multiplexedProcessor = new TMultiplexedProcessor();
-            multiplexedProcessor.registerProcessor("UserManagement", userManagementProcessor);
-            multiplexedProcessor.registerProcessor("Message", messageProcessor);
-
-            TServerTransport serverTransport = new TServerSocket(8081);
+            TServerTransport serverTransport = new TServerSocket(SERVICE_PORT);
             TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport).processor(multiplexedProcessor));
 
             System.out.println("Serving UserManagement Service and Message Service...");

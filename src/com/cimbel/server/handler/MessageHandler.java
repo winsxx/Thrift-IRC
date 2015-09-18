@@ -1,7 +1,6 @@
 package com.cimbel.server.handler;
 
-import com.cimbel.ircservice.MessageException;
-import com.cimbel.ircservice.MessageService;
+import com.cimbel.ircservice.*;
 import com.cimbel.server.data.MessageDataManager;
 import com.cimbel.server.data.UserDataManager;
 import org.apache.thrift.TException;
@@ -19,6 +18,10 @@ public class MessageHandler implements MessageService.Iface {
 
     @Override
     public void sendMessage(int userId, String message) throws TException {
+        if (!userDataManager.isUserIdExist(userId)) {
+            throw new MessageException(MessageErrorType.USER_ID_NOT_FOUND,
+                    "User ID not found");
+        }
         List<String> channelList = userDataManager.getUserChannelList(userId);
         for (String channel : channelList) {
             List<Integer> channelUserList = userDataManager.getChannelUserList(channel);
@@ -30,6 +33,13 @@ public class MessageHandler implements MessageService.Iface {
 
     @Override
     public void sendMessageToChannel(int userId, String channel, String message) throws TException {
+        if (!userDataManager.isUserIdExist(userId)) {
+            throw new MessageException(MessageErrorType.USER_ID_NOT_FOUND,
+                    "User ID not found");
+        }
+        if (!userDataManager.isChannelMember(userId, channel)) {
+            throw new MessageException(MessageErrorType.NOT_CHANNEL_MEMBER, "Not channel member");
+        }
         List<Integer> channelUserList = userDataManager.getChannelUserList(channel);
         for (Integer channelUserId : channelUserList) {
             messageDataManager.pushUserMessage(channelUserId, messageFormatting(channel, userId, message));
@@ -38,6 +48,10 @@ public class MessageHandler implements MessageService.Iface {
 
     @Override
     public List<String> fetchMessage(int userId) throws TException {
+        if (!userDataManager.isUserIdExist(userId)) {
+            throw new MessageException(MessageErrorType.USER_ID_NOT_FOUND,
+                    "User ID not found");
+        }
         return messageDataManager.popUserMessages(userId);
     }
 

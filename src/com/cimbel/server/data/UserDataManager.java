@@ -24,7 +24,7 @@ public class UserDataManager {
         mRandom = new Random();
     }
 
-    public static UserDataManager getInstance() {
+    public static synchronized UserDataManager getInstance() {
         if (mDataManagerSingleton == null) {
             mDataManagerSingleton = new UserDataManager();
         }
@@ -39,7 +39,7 @@ public class UserDataManager {
         return mIdToNickMapping.containsKey(userId);
     }
 
-    public int addUser(String nick) {
+    public int addUser(String nick) throws SecurityException {
         if (!isNicknameExist(nick)) {
             int newId = mRandom.nextInt(MAX_USER);
             while (isUserIdExist(newId)) {
@@ -50,7 +50,7 @@ public class UserDataManager {
             mUserChannelSetMap.put(newId, new TreeSet<>());
             return newId;
         } else {
-            return -1;
+            throw new SecurityException("Nickname " + nick + " is not available");
         }
     }
 
@@ -65,6 +65,19 @@ public class UserDataManager {
             mNickToIdMapping.remove(nick);
             mUserChannelSetMap.remove(userId);
             return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isChannelExist(String channel) {
+        return mChannelUserSetMap.containsKey(channel);
+    }
+
+    public boolean isChannelMember(int userId, String channel) {
+        if (isChannelExist((channel))) {
+            Set<String> channelSet = mUserChannelSetMap.get(userId);
+            return channelSet.contains(channel);
         } else {
             return false;
         }
