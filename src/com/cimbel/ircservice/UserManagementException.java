@@ -418,7 +418,7 @@ public class UserManagementException extends TException implements org.apache.th
         switch (schemeField.id) {
           case 1: // ERROR_TYPE
             if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
-              struct.errorType = com.cimbel.UserManagementErrorType.findByValue(iprot.readI32());
+              struct.errorType = com.cimbel.ircservice.UserManagementErrorType.findByValue(iprot.readI32());
               struct.setErrorTypeIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
@@ -495,7 +495,7 @@ public class UserManagementException extends TException implements org.apache.th
       TTupleProtocol iprot = (TTupleProtocol) prot;
       BitSet incoming = iprot.readBitSet(2);
       if (incoming.get(0)) {
-        struct.errorType = com.cimbel.UserManagementErrorType.findByValue(iprot.readI32());
+        struct.errorType = com.cimbel.ircservice.UserManagementErrorType.findByValue(iprot.readI32());
         struct.setErrorTypeIsSet(true);
       }
       if (incoming.get(1)) {
