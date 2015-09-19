@@ -1,5 +1,6 @@
 package com.cimbel.server.handler;
 
+import com.cimbel.ircservice.UserLoginData;
 import com.cimbel.ircservice.UserManagementErrorType;
 import com.cimbel.ircservice.UserManagementException;
 import com.cimbel.ircservice.UserManagementService;
@@ -22,14 +23,29 @@ public class UserManagementHandler implements UserManagementService.Iface {
     }
 
     @Override
-    public int loginNick(String nick) throws TException {
+    public UserLoginData loginNick(String nick) throws TException {
         log.info("[LOGIN_NICK] " + nick);
         try {
-            return userDataManager.addUser(nick);
+            if( userDataManager.isNicknameExist(nick) ){
+                int userId = userDataManager.getUserIdFromNick(nick);
+                log.info("[LOGIN_NICK] Nickname " + nick +" exist with User ID " + userId);
+                return new UserLoginData(userId, nick);
+            } else {
+                if(nick.equals("")){
+                    nick = userDataManager.generateNick();
+                }
+                int userId = userDataManager.addUser(nick);
+                log.info("[LOGIN_NICK] New nickname " + nick +" with User ID " + userId);
+                return new UserLoginData(userId, nick);
+            }
         } catch (SecurityException se) {
-            log.warning("[LOGIN_NICK][NICK_EXIST_ERROR] Nick: " + nick);
-            throw new UserManagementException(UserManagementErrorType.NICKNAME_USED,
-                    "Nickname has been used by others");
+            log.severe("[LOGIN_NICK] Unexpected SecurityException");
+            se.printStackTrace();
+            throw new UserManagementException(UserManagementErrorType.UNKNOWN_FAILURE, "Unexpected error");
+        } catch (IllegalArgumentException iae){
+            log.severe("[LOGIN_NICK] Unexpected IllegalArgumentException");
+            iae.printStackTrace();
+            throw new UserManagementException(UserManagementErrorType.UNKNOWN_FAILURE, "Unexpected error");
         }
     }
 

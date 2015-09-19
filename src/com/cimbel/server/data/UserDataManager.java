@@ -65,9 +65,31 @@ public class UserDataManager {
         }
     }
 
+    public String generateNick(){
+        synchronized (idNickLock){
+            int uniqueInt = mRandom.nextInt(MAX_USER);
+            String nick = "user-"+uniqueInt;
+            while (mNickToIdMapping.containsKey(nick)){
+                uniqueInt = mRandom.nextInt(MAX_USER);
+                nick = "user-"+uniqueInt;
+            }
+            return nick;
+        }
+    }
+
     public String getUserNick(int userId) {
         synchronized (idNickLock) {
             return mIdToNickMapping.get(userId);
+        }
+    }
+
+    public int getUserIdFromNick(String nick) throws IllegalArgumentException{
+        synchronized (idNickLock){
+            if(!mNickToIdMapping.containsKey(nick)){
+                return mNickToIdMapping.get(nick);
+            } else {
+                throw new IllegalArgumentException("Nick not available");
+            }
         }
     }
 
